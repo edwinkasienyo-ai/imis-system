@@ -1,6 +1,5 @@
 import React from "react";
 import "./LeftPanel.css";
-<img src="/school.jpg" alt="Students" className="left-image" />
 
 const LeftPanel = () => {
   return (
@@ -8,7 +7,7 @@ const LeftPanel = () => {
 
       {/* IMAGE */}
       <div className="image-section">
-        <img src={schoolImage} alt="IMIS" />
+        <img src="/school.jpg" alt="IMIS" className="left-image" />
       </div>
 
       {/* TITLE */}
