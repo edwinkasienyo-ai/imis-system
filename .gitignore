@@ -8,6 +8,8 @@ backend/.env
 backend/.env.*
 imis-frontend/.env.local
 backend/dist/
+backend/database.sqlite
+backend/database.sqlite-journal
 imis-frontend/build/
 imis-frontend/dist/
 *.log
