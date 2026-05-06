@@ -16,8 +16,8 @@ automatically. Either one will get you into the dashboard:
 
 | Username | Password      | Role               |
 | -------- | ------------- | ------------------ |
+| `952252` | `Sheeza@2015` | SYSTEM DEVELOPER   |
 | `admin`  | `Admin@1234`  | HOI/ADMINISTRATOR  |
-| `sysdev` | `Sysdev@1234` | SYSTEM DEVELOPER   |
 
 The login form also asks for a 6-digit **OTP**. In dev mode (the default),
 the OTP is **printed in the backend's PowerShell window** AND **shown in
@@ -72,13 +72,15 @@ Your browser opens at `http://localhost:3000` and shows the IMIS login.
 
 ### 4. Log in
 
-1. Pick a Portal Role (any value — the role check is informational at the
-   moment).
-2. Username: `admin`
-3. Password: `Admin@1234`
-4. Click **Send OTP** — an alert pops up showing the 6-digit OTP. Copy it.
-5. Paste the OTP into the OTP field.
-6. Click **Verify OTP & Login** — you land on `/dashboard`.
+1. **Portal Role**: pick `SYSTEM DEVELOPER` (any value works — the role check
+   is informational at the moment).
+2. **Username**: `952252`
+3. **Password**: `Sheeza@2015`
+4. **OTP channel**: any (`SMS`, `Email`, `Developer Console` — they all
+   behave identically in dev mode).
+5. Click **Send OTP** — an alert pops up showing the 6-digit OTP. Copy it.
+6. Paste the OTP into the **Enter OTP** field.
+7. Click **Verify OTP & Login** — you land on `/dashboard`.
 
 ## Switching to MySQL later
 

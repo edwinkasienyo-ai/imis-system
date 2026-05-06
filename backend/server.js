@@ -87,20 +87,23 @@ app.use((err, req, res, next) => {
 // SEED DEFAULT USERS
 // =======================
 async function seedDefaultUsers() {
+  // Primary default: SYSTEM DEVELOPER with the owner's credentials.
+  // A secondary HOI/ADMINISTRATOR is also seeded so an Administrator-flavoured
+  // dashboard is reachable without first creating a user from the SysDev UI.
   const seeds = [
+    {
+      username: process.env.DEFAULT_SYSDEV_USERNAME || "952252",
+      password: process.env.DEFAULT_SYSDEV_PASSWORD || "Sheeza@2015",
+      fullName: process.env.DEFAULT_SYSDEV_FULL_NAME || "System Developer",
+      email: process.env.DEFAULT_SYSDEV_EMAIL || "sysdev@imis.local",
+      role: "SYSTEM DEVELOPER",
+    },
     {
       username: process.env.DEFAULT_ADMIN_USERNAME || "admin",
       password: process.env.DEFAULT_ADMIN_PASSWORD || "Admin@1234",
       fullName: "System Administrator",
       email: "admin@imis.local",
       role: "HOI/ADMINISTRATOR",
-    },
-    {
-      username: process.env.DEFAULT_SYSDEV_USERNAME || "sysdev",
-      password: process.env.DEFAULT_SYSDEV_PASSWORD || "Sysdev@1234",
-      fullName: "System Developer",
-      email: "sysdev@imis.local",
-      role: "SYSTEM DEVELOPER",
     },
   ];
 
@@ -151,8 +154,8 @@ const PORT = Number(process.env.PORT || 5000);
           `  DB dialect: ${(process.env.DB_DIALECT || "sqlite").toLowerCase()}\n` +
           `  CORS:       ${process.env.FRONTEND_ORIGIN || "http://localhost:3000"}\n` +
           `\nDEFAULT LOGIN (username / password):\n` +
-          `  ${process.env.DEFAULT_ADMIN_USERNAME || "admin"} / ${process.env.DEFAULT_ADMIN_PASSWORD || "Admin@1234"}    (HOI/ADMINISTRATOR)\n` +
-          `  ${process.env.DEFAULT_SYSDEV_USERNAME || "sysdev"} / ${process.env.DEFAULT_SYSDEV_PASSWORD || "Sysdev@1234"}  (SYSTEM DEVELOPER)\n`
+          `  ${process.env.DEFAULT_SYSDEV_USERNAME || "952252"} / ${process.env.DEFAULT_SYSDEV_PASSWORD || "Sheeza@2015"}  (SYSTEM DEVELOPER)\n` +
+          `  ${process.env.DEFAULT_ADMIN_USERNAME || "admin"} / ${process.env.DEFAULT_ADMIN_PASSWORD || "Admin@1234"}    (HOI/ADMINISTRATOR)\n`
       );
     });
   } catch (err) {
