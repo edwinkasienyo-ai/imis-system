@@ -33,17 +33,29 @@ const RightPanel = () => {
   // ✅ SEND OTP
   const sendOTP = async () => {
     if (!form.role) return alert("Select Portal Role first");
+    if (!form.username) return alert("Enter username first");
 
     try {
-      await API.post("/auth/send-otp", form);
-      alert("OTP sent successfully ✅");
+      const res = await API.post("/auth/send-otp", form);
+      // In dev mode the backend returns the OTP in the response body so
+      // you don't have to configure SMS/Email to log in. Show it to the user.
+      if (res?.data?.otp) {
+        alert(`OTP sent (dev mode). Code: ${res.data.otp}`);
+      } else {
+        alert("OTP sent successfully ✅ — check your SMS/email or the server console.");
+      }
     } catch (err) {
-      alert("OTP failed ❌");
+      const msg = err?.response?.data?.message || err.message || "OTP failed";
+      alert(`OTP failed ❌  ${msg}`);
     }
   };
 
   // ✅ LOGIN
   const login = async () => {
+    if (!form.username || !form.password || !form.otp) {
+      return alert("Username, password and OTP are all required.");
+    }
+
     try {
       const res = await API.post("/auth/login", form);
 
@@ -52,7 +64,8 @@ const RightPanel = () => {
 
       window.location.href = "/dashboard";
     } catch (err) {
-      alert("Login failed ❌");
+      const msg = err?.response?.data?.message || err.message || "Login failed";
+      alert(`Login failed ❌  ${msg}`);
     }
   };
 
