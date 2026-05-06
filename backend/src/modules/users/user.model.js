@@ -8,11 +8,21 @@ const User = sequelize.define("User", {
     primaryKey: true,
   },
 
+  // Username is what the login form submits, so it must exist and be unique.
+  // It is allowed to be NULL only to keep migrations easy on existing rows;
+  // new rows always set it.
+  username: {
+    type: DataTypes.STRING,
+    unique: true,
+    allowNull: true,
+  },
+
   fullName: DataTypes.STRING,
 
   email: {
     type: DataTypes.STRING,
     unique: true,
+    allowNull: true,
   },
 
   password: DataTypes.STRING,
@@ -21,6 +31,8 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     defaultValue: "USER",
   },
+}, {
+  timestamps: true,
 });
 
 module.exports = User;
