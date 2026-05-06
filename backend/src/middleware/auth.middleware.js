@@ -1,29 +1,30 @@
 const jwt = require("jsonwebtoken");
 
+const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret-change-me";
+
 exports.verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
 
   if (!token) {
-    return res.status(403).json({ message: "No token ❌" });
+    return res.status(401).json({ message: "Missing or malformed Authorization header" });
   }
 
   try {
-    const decoded = jwt.verify(token, "imis_secret");
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
-    next();
+    return next();
   } catch (err) {
-    res.status(401).json({ message: "Invalid token ❌" });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
-// ROLE BASED ACCESS
+// ROLE-BASED ACCESS
 exports.authorizeRoles = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        message: "Access denied ❌",
-      });
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied" });
     }
-    next();
+    return next();
   };
 };
