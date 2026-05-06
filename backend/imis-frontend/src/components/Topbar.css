@@ -1,0 +1,17 @@
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.topbar input {
+  padding: 8px;
+  width: 250px;
+}
+
+.profile {
+  background: #0d6efd;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+}

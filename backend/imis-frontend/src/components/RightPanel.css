@@ -1,0 +1,36 @@
+.right-panel {
+  width: 50%;
+  padding: 40px;
+  background: #ffffff;
+}
+
+.right-panel h2 {
+  color: #0a2540;
+}
+
+.right-panel input,
+.right-panel select {
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.right-panel button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: linear-gradient(90deg, #0ea5e9, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 12px;
+}

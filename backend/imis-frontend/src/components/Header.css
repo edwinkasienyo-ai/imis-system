@@ -1,0 +1,17 @@
+.header {
+  background: linear-gradient(to right, #1e88e5, #0b3c5d);
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header input {
+  padding: 6px;
+  margin-right: 10px;
+}
+
+.user {
+  font-weight: bold;
+}
