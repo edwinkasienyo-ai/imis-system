@@ -8,6 +8,7 @@ require("dotenv").config();
 // =======================
 const express = require("express");
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
 
 // =======================
 // INIT APP
@@ -17,10 +18,12 @@ const app = express();
 // =======================
 // MIDDLEWARE
 // =======================
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_ORIGIN || "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,12 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 // DATABASE
 // =======================
 const sequelize = require("./src/config/db");
-
-// =======================
-// MODELS (IMPORTANT FOR DEFAULT USER)
-// =======================
 const User = require("./src/modules/users/user.model");
-const bcrypt = require("bcryptjs");
 
 // =======================
 // ROUTES
@@ -44,18 +42,19 @@ const dashboardRoutes = require("./src/modules/dashboard/dashboard.routes");
 const authRoutes = require("./src/modules/auth/auth.routes");
 
 app.use("/api/auth", authRoutes);
+
 // =======================
 // ROOT
 // =======================
 app.get("/", (req, res) => {
-  res.send("IMIS SYSTEM BACKEND RUNNING 🚀");
+  res.send("IMIS SYSTEM BACKEND RUNNING");
 });
 
 // =======================
 // TEST ROUTE
 // =======================
 app.get("/api/test", (req, res) => {
-  res.json({ message: "API working ✅" });
+  res.json({ message: "API working" });
 });
 
 // =======================
@@ -68,60 +67,97 @@ app.use("/api/dashboard", dashboardRoutes);
 // 404 HANDLER
 // =======================
 app.use((req, res) => {
-  res.status(404).json({ message: "Route not found ❌" });
+  res.status(404).json({ message: "Route not found" });
 });
 
 // =======================
 // ERROR HANDLER
 // =======================
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error("SERVER ERROR ❌:", err);
+  // eslint-disable-next-line no-console
+  console.error("SERVER ERROR:", err);
   res.status(500).json({
-    message: "Internal Server Error ❌",
+    message: "Internal Server Error",
     error: err.message,
   });
 });
 
 // =======================
+// SEED DEFAULT USERS
+// =======================
+async function seedDefaultUsers() {
+  const seeds = [
+    {
+      username: process.env.DEFAULT_ADMIN_USERNAME || "admin",
+      password: process.env.DEFAULT_ADMIN_PASSWORD || "Admin@1234",
+      fullName: "System Administrator",
+      email: "admin@imis.local",
+      role: "HOI/ADMINISTRATOR",
+    },
+    {
+      username: process.env.DEFAULT_SYSDEV_USERNAME || "sysdev",
+      password: process.env.DEFAULT_SYSDEV_PASSWORD || "Sysdev@1234",
+      fullName: "System Developer",
+      email: "sysdev@imis.local",
+      role: "SYSTEM DEVELOPER",
+    },
+  ];
+
+  for (const seed of seeds) {
+    // eslint-disable-next-line no-await-in-loop
+    const existing = await User.findOne({ where: { username: seed.username } });
+    if (existing) continue;
+
+    // eslint-disable-next-line no-await-in-loop
+    const hashed = await bcrypt.hash(seed.password, 10);
+    // eslint-disable-next-line no-await-in-loop
+    await User.create({
+      username: seed.username,
+      password: hashed,
+      fullName: seed.fullName,
+      email: seed.email,
+      role: seed.role,
+    });
+    // eslint-disable-next-line no-console
+    console.log(
+      `[SEED] Created default user: ${seed.username} (role: ${seed.role})`
+    );
+  }
+}
+
+// =======================
 // START SERVER
 // =======================
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT || 5000);
 
-sequelize.authenticate()
-  .then(async () => {
-    console.log("Database connected ✅");
+(async () => {
+  try {
+    await sequelize.authenticate();
+    // eslint-disable-next-line no-console
+    console.log("Database connected");
 
     await sequelize.sync({ alter: true });
-    console.log("Database synced successfully ✅");
+    // eslint-disable-next-line no-console
+    console.log("Database synced");
 
-    // =======================
-    // CREATE DEFAULT USER (CLEAN)
-    // =======================
-    const exists = await User.findOne({
-      where: { email: "teacher@test.com" }
-    });
+    await seedDefaultUsers();
 
-    if (!exists) {
-      const hashed = await bcrypt.hash("123456", 10);
-
-      await User.create({
-        fullName: "Test Teacher",
-        email: "teacher@test.com",
-        password: hashed,
-        role: "USER"
-      });
-
-      console.log("Default user created ✅");
-    }
-
-    // =======================
-    // START SERVER
-    // =======================
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT} 🚀`);
+      // eslint-disable-next-line no-console
+      console.log(
+        `\nIMIS BACKEND RUNNING\n` +
+          `  URL:        http://localhost:${PORT}\n` +
+          `  DB dialect: ${(process.env.DB_DIALECT || "sqlite").toLowerCase()}\n` +
+          `  CORS:       ${process.env.FRONTEND_ORIGIN || "http://localhost:3000"}\n` +
+          `\nDEFAULT LOGIN (username / password):\n` +
+          `  ${process.env.DEFAULT_ADMIN_USERNAME || "admin"} / ${process.env.DEFAULT_ADMIN_PASSWORD || "Admin@1234"}    (HOI/ADMINISTRATOR)\n` +
+          `  ${process.env.DEFAULT_SYSDEV_USERNAME || "sysdev"} / ${process.env.DEFAULT_SYSDEV_PASSWORD || "Sysdev@1234"}  (SYSTEM DEVELOPER)\n`
+      );
     });
-
-  })
-  .catch((err) => {
-    console.error("Database connection failed ❌:", err);
-  });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to start server:", err);
+    process.exit(1);
+  }
+})();
